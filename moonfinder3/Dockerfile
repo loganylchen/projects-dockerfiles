@@ -8,9 +8,9 @@ ADD requirements.txt /tmp/
 
 
 RUN Rscript /tmp/install_packages.R  && \
-    pip install -r /tmp/requirements.txt
-
-RUN apt autoremove && \
+    pip install -r /tmp/requirements.txt && \
+    useradd -m -u 501 logan && \
+    apt autoremove && \
     apt clean && \
     apt autoclean && \
     rm -rf /tmp/*
