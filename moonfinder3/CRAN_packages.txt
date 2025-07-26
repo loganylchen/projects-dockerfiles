@@ -31,3 +31,5 @@ survminer
 tidyr
 tidyverse
 VennDiagram
+networkD3
+ggfortify
