@@ -33,3 +33,4 @@ tidyverse
 VennDiagram
 networkD3
 ggfortify
+eoffice
