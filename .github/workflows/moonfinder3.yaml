@@ -68,7 +68,7 @@ jobs:
             type=ref,event=branch,enable=${{ github.ref != 'refs/heads/main' }}
             type=semver,pattern={{version}}
             type=raw,value=latest,enable={{is_default_branch}}
-            type=raw,value=arm-${{ steps.date.outputs.date }},enable={{is_default_branch}}
+            type=raw,value=${{ steps.date.outputs.date }},enable={{is_default_branch}}
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
@@ -87,5 +87,5 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=registry,ref=${{ secrets.DH_USER }}/env-moonfinder3-arm:cache
-          cache-to: type=registry,ref=${{ secrets.DH_USER }}/env-moonfinder3-arm:cache,mode=max
+          cache-from: type=registry,ref=${{ secrets.DH_USER }}/env-moonfinder3:cache
+          cache-to: type=registry,ref=${{ secrets.DH_USER }}/env-moonfinder3:cache,mode=max
