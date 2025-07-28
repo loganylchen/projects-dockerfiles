@@ -7,6 +7,9 @@ on:
   release:
   workflow_dispatch:
 
+env:
+  REGISTRY_IMAGE: ${{ secrets.DH_USER }}/env-moonfinder3
+
 
 jobs:
   amd64:
@@ -33,7 +36,7 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: |
-            ${{ secrets.DH_USER }}/env-moonfinder3
+            ${{ env.REGISTRY_IMAGE }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -51,10 +54,10 @@ jobs:
           context: ./moonfinder3/
           platforms: linux/amd64
           # push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ secrets.DH_USER }}/cache
+          tags: ${{ env.REGISTRY_IMAGE }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=registry,ref=${{ secrets.DH_USER }}/env-moonfinder3:amd64-cache
-          cache-to: type=registry,ref=${{ secrets.DH_USER }}/env-moonfinder3:amd64-cache,mode=max
+          cache-from: type=registry,ref=${{ env.REGISTRY_IMAGE }}:amd64-cache
+          cache-to: type=registry,ref=${{ env.REGISTRY_IMAGE }}:amd64-cache,mode=max
           outputs: type=image,push-by-digest=true,name-canonical=true,push=true
 
       - name: Export digest
@@ -95,7 +98,7 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: |
-            ${{ secrets.DH_USER }}/env-moonfinder3
+            ${{ env.REGISTRY_IMAGE }}
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
@@ -113,10 +116,10 @@ jobs:
           context: ./moonfinder3/
           platforms: linux/arm64
           # push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ secrets.DH_USER }}/env-moonfinder3
+          tags: ${{ env.REGISTRY_IMAGE }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=registry,ref=${{ secrets.DH_USER }}/env-moonfinder3:arm64-cache
-          cache-to: type=registry,ref=${{ secrets.DH_USER }}/env-moonfinder3:arm64-cache,mode=max
+          cache-from: type=registry,ref=${{ env.REGISTRY_IMAGE }}:arm64-cache
+          cache-to: type=registry,ref=${{ env.REGISTRY_IMAGE }}:arm64-cache,mode=max
           outputs: type=image,push-by-digest=true,name-canonical=true,push=true
 
       - name: Export digest
