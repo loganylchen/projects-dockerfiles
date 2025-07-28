@@ -59,7 +59,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=registry,ref=${{ secrets.DH_USER }}/env-moonfinder3:amd64-cache
           cache-to: type=registry,ref=${{ secrets.DH_USER }}/env-moonfinder3:amd64-cache,mode=max
-          outputs: type=image,push-by-digest=true,name-canonical=true,push=false
+          outputs: type=image,push-by-digest=true,name-canonical=true,push=true
 
       - name: Export digest
         run: |
@@ -126,7 +126,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=registry,ref=${{ secrets.DH_USER }}/env-moonfinder3:arm64-cache
           cache-to: type=registry,ref=${{ secrets.DH_USER }}/env-moonfinder3:arm64-cache,mode=max
-          outputs: type=image,push-by-digest=true,name-canonical=true,push=false
+          outputs: type=image,push-by-digest=true,name-canonical=true,push=true
 
       - name: Export digest
         run: |
