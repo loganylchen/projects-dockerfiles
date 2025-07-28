@@ -122,7 +122,7 @@ jobs:
           context: ./moonfinder3/
           platforms: linux/arm64
           # push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ secrets.DH_USER }}/cache
+          tags: ${{ secrets.DH_USER }}/env-moonfinder3
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=registry,ref=${{ secrets.DH_USER }}/env-moonfinder3:arm64-cache
           cache-to: type=registry,ref=${{ secrets.DH_USER }}/env-moonfinder3:arm64-cache,mode=max
