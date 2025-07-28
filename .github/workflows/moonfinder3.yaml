@@ -14,6 +14,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Create Docker daemon.json
+        run: |
+          sudo mkdir -p /mnt/docker
+          sudo chmod 777 /mnt/docker
+          sudo mkdir -p /etc/docker
+          sudo cp daemon.json /etc/docker/daemon.json 
+      - name: Restart Docker service
+        run: |
+          sudo docker info
+          sudo systemctl restart docker
+          sudo docker info
       - name: Get current date
         id: date
         run: echo "::set-output name=date::$(date +'%Y%m%d')"
@@ -48,7 +59,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=registry,ref=${{ secrets.DH_USER }}/env-moonfinder3:amd64-cache
           cache-to: type=registry,ref=${{ secrets.DH_USER }}/env-moonfinder3:amd64-cache,mode=max
-          outputs: type=image,push-by-digest=true,name-canonical=true,push=true
+          outputs: type=image,push-by-digest=true,name-canonical=true,push=false
 
       - name: Export digest
         run: |
@@ -72,6 +83,17 @@ jobs:
       - name: Get current date
         id: date
         run: echo "::set-output name=date::$(date +'%Y%m%d')"
+      - name: Create Docker daemon.json
+        run: |
+          sudo mkdir -p /mnt/docker
+          sudo chmod 777 /mnt/docker
+          sudo mkdir -p /etc/docker
+          sudo cp daemon.json /etc/docker/daemon.json 
+      - name: Restart Docker service
+        run: |
+          sudo docker info
+          sudo systemctl restart docker
+          sudo docker info
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v4
@@ -104,7 +126,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=registry,ref=${{ secrets.DH_USER }}/env-moonfinder3:arm64-cache
           cache-to: type=registry,ref=${{ secrets.DH_USER }}/env-moonfinder3:arm64-cache,mode=max
-          outputs: type=image,push-by-digest=true,name-canonical=true,push=true
+          outputs: type=image,push-by-digest=true,name-canonical=true,push=false
 
       - name: Export digest
         run: |
