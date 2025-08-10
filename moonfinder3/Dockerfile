@@ -9,6 +9,8 @@ ADD requirements.txt /tmp/
 
 RUN Rscript /tmp/install_packages.R  && \
     pip install -r /tmp/requirements.txt && \
+    git config --global user.name "loganylchen" && \
+    git config --global user.email "yuelong.chen.btr@gmail.com" && \
     useradd -m -u 501 logan && \
     apt autoremove && \
     apt clean && \
