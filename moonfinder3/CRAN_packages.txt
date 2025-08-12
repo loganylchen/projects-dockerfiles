@@ -34,3 +34,4 @@ VennDiagram
 networkD3
 ggfortify
 eoffice
+languageserver
