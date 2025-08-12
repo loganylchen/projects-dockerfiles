@@ -9,7 +9,8 @@ on:
 
 env:
   REGISTRY_IMAGE: ${{ secrets.DH_USER }}/env-mpage
-  PATH: ./mpage/
+  WORK_PATH: ./mpage/
+
 
 
 jobs:
@@ -52,7 +53,7 @@ jobs:
         id: build
         uses: docker/build-push-action@v3
         with:
-          context: ${{ env.PATH }}
+          context: ${{ env.WORK_PATH }}
           platforms: linux/amd64
           # push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ env.REGISTRY_IMAGE }}
@@ -114,7 +115,7 @@ jobs:
         id: build
         uses: docker/build-push-action@v3
         with:
-          context: ${{ env.PATH }}
+          context: ${{ env.WORK_PATH }}
           platforms: linux/arm64
           # push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ env.REGISTRY_IMAGE }}
