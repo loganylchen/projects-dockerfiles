@@ -25,3 +25,4 @@ pheatmap
 RColorBrewer
 circlize
 languageserver
+IRkernel
