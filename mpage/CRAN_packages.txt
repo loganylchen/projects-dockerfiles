@@ -27,3 +27,4 @@ circlize
 languageserver
 IRkernel
 usethis
+progress
