@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 env:
-  REGISTRY_IMAGE: ${{ secrets.DH_USER }}/env-mpage=paper
+  REGISTRY_IMAGE: ${{ secrets.DH_USER }}/env-mpage-paper
   WORK_PATH: ./mpage-paper/
 
 
