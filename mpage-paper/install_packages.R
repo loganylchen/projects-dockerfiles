@@ -35,7 +35,7 @@ tryCatch({
     quit(status = 1)
 })
 
-
+cat('install MPAGE')
 devtools::install_github('loganylchen/MPAGE',ref='dev')
 
 IRkernel::installspec(name = 'VSCODE_R', displayname = 'VSCODE_R', user = FALSE)
