@@ -11,7 +11,7 @@ RUN Rscript /tmp/install_packages.R  && \
     pip install -r /tmp/requirements.txt && \
     git config --global user.name "loganylchen" && \
     git config --global user.email "yuelong.chen.btr@gmail.com" && \
-    useradd -m -u 501 logan && \
+    useradd -m -u 1777 logan && \
     apt autoremove && \
     apt clean && \
     apt autoclean && \
