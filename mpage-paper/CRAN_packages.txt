@@ -28,3 +28,5 @@ languageserver
 IRkernel
 usethis
 progress
+glmnet
+pROC
