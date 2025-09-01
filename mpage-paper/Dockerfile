@@ -21,3 +21,4 @@ RUN git config --global user.name "loganylchen" && \
     apt clean && \
     apt autoclean && \
     rm -rf /tmp/*
+USER $USER_NAME
