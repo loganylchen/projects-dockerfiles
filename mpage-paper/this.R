@@ -1,2 +1,2 @@
 cat('install MPAGE')
-devtools::install_github('loganylchen/MPAGE@f9be2e09f55c3f6344a022352f10a62206570d6e',ref='dev')
+devtools::install_github('loganylchen/MPAGE@6d51bd6891945d9af21b7b3eddc27cf5f03092d9',ref='dev')
