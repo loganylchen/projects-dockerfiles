@@ -3,13 +3,13 @@ name: grf-2025
 on:
   push:
     paths:
-      - 'grf-2025 /**'
+      - 'grf-2025/**'
   release:
   workflow_dispatch:
 
 env:
   REGISTRY_IMAGE: ${{ secrets.DH_USER }}/env-grf-2025 
-  WORK_PATH: ./grf-2025 /
+  WORK_PATH: ./grf-2025/
 
 
 
