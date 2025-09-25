@@ -13,6 +13,9 @@ ADD requirements.txt /tmp/
 
 RUN Rscript /tmp/install_packages.R  && \
     pip install -r /tmp/requirements.txt 
+
+ADD this.R /tmp/
+RUN Rscript /tmp/this.R
 RUN git config --global user.name "loganylchen" && \
     git config --global user.email "yuelong.chen.btr@gmail.com" && \
     groupadd --gid $USER_GID loganvscode && \

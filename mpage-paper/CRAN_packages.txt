@@ -28,3 +28,13 @@ languageserver
 IRkernel
 usethis
 progress
+glmnet
+pROC
+ggpubr
+ggsci
+extrafont
+ggVennDiagram
+PRROC
+geneset
+corrplot
+ggExtra
