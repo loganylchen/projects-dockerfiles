@@ -8,7 +8,7 @@ ARG USER_GID=1777
 ARG USER_NAME=loganvscode
 
 
-RUN micromamba install -y -c conda-forge -c bioconda circos=${VERSION} git stringtie r-irkernel nanocount r-languageserver \
+RUN micromamba install -y -c conda-forge -c bioconda circos=${VERSION} git stringtie r-irkernel nanocount r-languageserver r-roxygen2 r-devtools \
     && git config --global user.name "loganylchen" \
     && git config --global user.email "yuelong.chen.btr@gmail.com"  \
     && micromamba clean --all --yes
