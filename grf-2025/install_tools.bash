@@ -1,1 +1,1 @@
-micromamba install -y -c conda-forge -c bioconda stringtie nanocount
+micromamba install -y -n $1 -c conda-forge -c bioconda stringtie nanocount

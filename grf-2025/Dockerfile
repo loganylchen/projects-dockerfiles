@@ -27,9 +27,9 @@ ADD requirements.txt /tmp/
 
 
 
-RUN bash /tmp/install_tools.bash && \
-    bash /tmp/CRAN_packages.bash && \
-    bash /tmp/bioconductor_packages.bash && \
+RUN bash /tmp/install_tools.bash ${NEW_ENV_NAME} && \
+    bash /tmp/CRAN_packages.bash ${NEW_ENV_NAME} && \
+    bash /tmp/bioconductor_packages.bash ${NEW_ENV_NAME} && \
     micromamba run -n ${NEW_ENV_NAME} Rscript /tmp/devtools_packages.R && \
     micromamba run -n ${NEW_ENV_NAME} pip install -r /tmp/requirements.txt 
 
