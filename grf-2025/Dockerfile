@@ -1,6 +1,7 @@
-FROM mambaorg/micromamba:latest
+FROM mambaorg/micromamba:1.3.1
 ENV MAMBA_DOCKERFILE_ACTIVATE=1
 ENV PATH=/opt/conda/bin:$PATH
+ENV MAMBA_ROOT_PREFIX=/opt/conda
 ENV ENV_NAME=GRF
 ARG VERSION=0.69.9
 
