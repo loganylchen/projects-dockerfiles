@@ -35,7 +35,7 @@ RUN bash /tmp/install_tools.bash && \
 ADD this.R /tmp/
 RUN Rscript /tmp/this.R
 
-
+USER root
 
 RUN groupadd --gid $USER_GID loganvscode && \
     useradd -u $USER_UID -g $USER_NAME -s /bin/bash -m $USER_NAME  && \
