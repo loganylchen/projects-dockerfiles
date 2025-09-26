@@ -140,7 +140,7 @@ jobs:
   merge:
     runs-on: ubuntu-latest
     needs:
-      - arm64
+      # - arm64
       - amd64
     steps:
       - name: Get current date
