@@ -1,5 +1,5 @@
 FROM mambaorg/micromamba:1.3.1
-ENV MAMBA_DOCKERFILE_ACTIVATE=1
+
 ENV PATH=/opt/conda/bin:$PATH
 ENV MAMBA_ROOT_PREFIX=/opt/conda
 ENV ENV_NAME=GRF
@@ -9,7 +9,7 @@ ARG USER_UID=1777
 ARG USER_GID=1777
 ARG USER_NAME=loganvscode
 
-USER root
+
 
 RUN micromamba create -y -n ${ENV_NAME} git r-base=4.4.3 python=3.10  &&\
     micromamba install -n ${ENV_NAME} -y -c conda-forge -c bioconda circos=${VERSION} \
@@ -49,6 +49,6 @@ RUN groupadd --gid $USER_GID loganvscode && \
     rm -rf /tmp/*
 
 USER $USER_NAME 
-
+ENV MAMBA_DOCKERFILE_ACTIVATE=1
 CMD ["micromamba", "run", "-n", "${ENV_NAME}", "bash"]
 
