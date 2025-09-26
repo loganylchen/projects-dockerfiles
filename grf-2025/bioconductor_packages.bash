@@ -16,10 +16,7 @@ bioconductor-biomart \
 bioconductor-geoquery \
 bioconductor-gosemsim \
 bioconductor-gsva \
-bioconductor-convertid \
-bioconductor-mcode \
 bioconductor-genefilter \
-bioconductor-geneset \
 bioconductor-biobase \
 bioconductor-annotationdbi \
 bioconductor-gseabase \
