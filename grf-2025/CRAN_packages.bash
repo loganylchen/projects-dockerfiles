@@ -1,4 +1,4 @@
-micromamba install -y -c conda-forge -c bioconda \
+micromamba install -n ${ENV_NAME} -y -c conda-forge -c bioconda \
 r-irkernel  \
 r-languageserver \
 r-devtools \
