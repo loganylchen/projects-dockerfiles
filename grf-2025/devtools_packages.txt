@@ -1,3 +1,0 @@
-erocoar/gghalves gghalves
-kevinblighe/EnhancedVolcano EnhancedVolcano
-kassambara/survminer survminer
