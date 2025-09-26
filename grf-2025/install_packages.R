@@ -14,7 +14,7 @@ github_packages <-  read.table(file.path(script_dir, "devtools_packages.txt"),
 
 
 tryCatch({
-    install.packages(base_packages)
+    install.packages(base_packages,repos = "http://cran.us.r-project.org")
 }, error = function(e) {
     message('CRAN R packages: ', conditionMessage(e))
     quit(status = 1)
