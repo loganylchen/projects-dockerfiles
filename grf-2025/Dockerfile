@@ -18,7 +18,7 @@ RUN micromamba install -y -c conda-forge -c bioconda circos=${VERSION} git  \
 ADD install_tools.bash /tmp/
 ADD CRAN_packages.bash /tmp/
 ADD devtools_packages.R /tmp/
-ADD bioconductor_packages.bah /tmp/
+ADD bioconductor_packages.bash /tmp/
 ADD requirements.txt /tmp/
 
 
