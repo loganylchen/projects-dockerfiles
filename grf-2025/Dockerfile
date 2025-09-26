@@ -10,7 +10,7 @@ ARG USER_GID=1777
 ARG USER_NAME=loganvscode
 
 
-
+USER root
 RUN micromamba create -y -c conda-forge -n ${NEW_ENV_NAME} git r-base=4.4.3 python=3.10  &&\
     micromamba install -n ${NEW_ENV_NAME} -y -c conda-forge -c bioconda circos=${VERSION} \
     && micromamba run -n ${NEW_ENV_NAME} git config --global user.name "loganylchen" \
