@@ -19,4 +19,9 @@ bioconductor-gsva \
 bioconductor-convertid \
 bioconductor-mcode \
 bioconductor-genefilter \
-bioconductor-rcy3
+bioconductor-geneset \
+bioconductor-biobase \
+bioconductor-annotationdbi \
+bioconductor-gseabase \
+bioconductor-biocstyle \
+bioconductor-rcy3 

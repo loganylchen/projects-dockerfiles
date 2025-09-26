@@ -3,7 +3,6 @@ r-irkernel  \
 r-languageserver \
 r-devtools \
 r-igraph \
-r-gseabase \
 r-cluster \
 r-ggplot2 \
 r-dplyr \
@@ -13,14 +12,9 @@ r-readr \
 r-stringr \
 r-purrr \
 r-rlang \
-r-biobase \
-r-annotationdbi \
-r-stats \
-r-utils \
 r-testthat \
 r-knitr \
 r-rmarkdown \
-r-biocstyle \
 r-pheatmap \
 r-rcolorbrewer \
 r-circlize \
@@ -35,6 +29,5 @@ r-ggsci \
 r-extrafont \
 r-ggvenndiagram \
 r-prroc \
-r-geneset \
 r-corrplot \
 r-ggextra
