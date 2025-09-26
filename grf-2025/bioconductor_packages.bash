@@ -20,5 +20,4 @@ bioconductor-genefilter \
 bioconductor-biobase \
 bioconductor-annotationdbi \
 bioconductor-gseabase \
-bioconductor-biocstyle \
-bioconductor-rcy3 
+bioconductor-biocstyle 
