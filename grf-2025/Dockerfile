@@ -1,8 +1,19 @@
-FROM btrspg/vscode-base:0.0.6
+FROM mambaorg/micromamba:latest
+ENV MAMBA_DOCKERFILE_ACTIVATE=1
+ENV PATH=/opt/conda/bin:$PATH
+ARG VERSION=0.69.9
 
 ARG USER_UID=1777
 ARG USER_GID=1777
 ARG USER_NAME=loganvscode
+
+
+RUN micromamba install -y -c conda-forge -c bioconda circos=${VERSION} git stringtie \
+    && git config --global user.name "loganylchen" \
+    && git config --global user.email "yuelong.chen.btr@gmail.com"  \
+    && micromamba clean --all --yes
+
+
 
 ADD install_packages.R /tmp/
 ADD bioconductor_packages.txt /tmp/
@@ -16,12 +27,11 @@ RUN Rscript /tmp/install_packages.R  && \
 
 ADD this.R /tmp/
 RUN Rscript /tmp/this.R
-RUN git config --global user.name "loganylchen" && \
-    git config --global user.email "yuelong.chen.btr@gmail.com" && \
-    groupadd --gid $USER_GID loganvscode && \
+RUN groupadd --gid $USER_GID loganvscode && \
     useradd -u $USER_UID -g $USER_NAME -s /bin/bash -m $USER_NAME  && \
     apt autoremove && \
     apt clean && \
     apt autoclean && \
     rm -rf /tmp/*
+
 USER $USER_NAME 
