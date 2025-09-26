@@ -1,5 +1,7 @@
 micromamba install -y -c conda-forge -c bioconda \
-r-irkernel  r-languageserver r-devtools 
+r-irkernel  \
+r-languageserver \
+r-devtools \
 r-igraph \
 r-gseabase \
 r-cluster \
