@@ -8,9 +8,10 @@ ARG USER_UID=1777
 ARG USER_GID=1777
 ARG USER_NAME=loganvscode
 
+USER root
 
-RUN micromamba create -n ${ENV_NAME} &&\
-    micromamba install -n ${ENV_NAME} -y -c conda-forge -c bioconda circos=${VERSION} git r-base=4.4.3 python=3.10 \
+RUN micromamba create -y -n ${ENV_NAME} 
+RUN micromamba install -n ${ENV_NAME} -y -c conda-forge -c bioconda circos=${VERSION} git r-base=4.4.3 python=3.10 \
     && git config --global user.name "loganylchen" \
     && git config --global user.email "yuelong.chen.btr@gmail.com"  \
     && micromamba clean --all --yes
@@ -37,7 +38,7 @@ RUN bash /tmp/install_tools.bash && \
 ADD this.R /tmp/
 RUN Rscript /tmp/this.R
 
-USER root
+
 
 RUN groupadd --gid $USER_GID loganvscode && \
     useradd -u $USER_UID -g $USER_NAME -s /bin/bash -m $USER_NAME  && \
