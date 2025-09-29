@@ -37,7 +37,8 @@ RUN bash /tmp/install_tools.bash ${NEW_ENV_NAME} && \
 
 
 ADD this.R /tmp/
-RUN micromamba run -n ${NEW_ENV_NAME} Rscript /tmp/this.R
+RUN micromamba run -n ${NEW_ENV_NAME} Rscript /tmp/this.R &&\
+    micromamba run -n ${NEW_ENV_NAME} python -m ipykernel install --name GRF --display-name "GRF-Python"
 
 
 
