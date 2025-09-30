@@ -20,4 +20,5 @@ bioconductor-genefilter \
 bioconductor-biobase \
 bioconductor-annotationdbi \
 bioconductor-gseabase \
-bioconductor-biocstyle 
+bioconductor-biocstyle \
+bioconductor-sangerseqr
