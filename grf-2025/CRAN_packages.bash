@@ -30,5 +30,4 @@ r-extrafont \
 r-ggvenndiagram \
 r-prroc \
 r-corrplot \
-r-ggextra \
-r-doubleexpseq
+r-ggextra 
