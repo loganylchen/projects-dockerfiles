@@ -6,4 +6,4 @@ ipywidgets
 jupyter
 jupyterlab
 snakemake
-smakedeploy
+snakedeploy
