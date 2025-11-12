@@ -84,7 +84,7 @@ RUN micromamba install -y \
     bioconda::bioconductor-impute \
     && micromamba clean --all --yes
 
-ADD ./install_R_packages.R /tmp/
+ADD ./install_packages.R /tmp/
 ADD ./devtools_packages.txt /tmp/
 
 
