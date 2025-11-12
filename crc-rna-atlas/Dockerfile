@@ -30,15 +30,13 @@ RUN micromamba install -y \
     conda-forge::r-stringr \
     conda-forge::r-purrr \
     conda-forge::r-rlang \
-    conda-forge::r-biobase \
-    conda-forge::r-org.hs.eg.db \
+    bioconda::bioconductor-biobase \
+    bioconda::bioconductor-org.hs.eg.db \
     conda-forge::r-annotationdbi \
-    conda-forge::r-stats \
-    conda-forge::r-utils \
     conda-forge::r-testthat \
     conda-forge::r-knitr \
     conda-forge::r-rmarkdown \
-    conda-forge::r-biocstyle \
+    bioconda::bioconductor-biocstyle \
     conda-forge::r-pheatmap \
     conda-forge::r-rcolorbrewer \
     conda-forge::r-circlize \
@@ -53,7 +51,7 @@ RUN micromamba install -y \
     conda-forge::r-extrafont \
     conda-forge::r-ggvenndiagram \
     conda-forge::r-prroc \
-    conda-forge::r-geneset \
+    bioconda::bioconductor-geneset \
     conda-forge::r-corrplot\
     conda-forge::r-ggextra \
     bioconda::bioconductor-gseabase \
@@ -77,8 +75,6 @@ RUN micromamba install -y \
     bioconda::bioconductor-geoquery \
     bioconda::bioconductor-gosemsim \
     bioconda::bioconductor-gsva \
-    bioconda::bioconductor-convertid \
-    bioconda::bioconductor-mcode \
     bioconda::bioconductor-genefilter \
     bioconda::bioconductor-rcy3 \
     bioconda::bioconductor-impute \
