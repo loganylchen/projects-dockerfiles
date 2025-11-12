@@ -32,7 +32,7 @@ RUN micromamba install -y \
     conda-forge::r-rlang \
     bioconda::bioconductor-biobase \
     bioconda::bioconductor-org.hs.eg.db \
-    conda-forge::r-annotationdbi \
+    bioconda::bioconductor-annotationdbi \
     conda-forge::r-testthat \
     conda-forge::r-knitr \
     conda-forge::r-rmarkdown \
@@ -51,7 +51,6 @@ RUN micromamba install -y \
     conda-forge::r-extrafont \
     conda-forge::r-ggvenndiagram \
     conda-forge::r-prroc \
-    bioconda::bioconductor-geneset \
     conda-forge::r-corrplot\
     conda-forge::r-ggextra \
     bioconda::bioconductor-gseabase \
