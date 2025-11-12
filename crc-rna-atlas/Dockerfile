@@ -84,7 +84,7 @@ ADD ./devtools_packages.txt /tmp/
 
 
 USER root
-RUN micromamba run -n base Rscript /tmp/install_R_packages.R &&\
+RUN micromamba run -n base Rscript /tmp/install_packages.R &&\
     git config --global user.name "loganylchen" && \
     git config --global user.email "yuelong.chen.btr@gmail.com" && \
     groupadd --gid $USER_GID loganvscode && \
