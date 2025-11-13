@@ -8,6 +8,7 @@ ENV PATH=/opt/conda/bin:$PATH
 
 
 RUN micromamba install -y \
+    conda-forge::r-ggalt \
     conda-forge::git \
     anaconda::jupyter \
     conda-forge::r-ggplot2 \
