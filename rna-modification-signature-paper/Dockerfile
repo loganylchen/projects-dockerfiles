@@ -26,6 +26,7 @@ RUN micromamba install -y \
     bioconda::bioconductor-genefilter \
     bioconda::bioconductor-geoquery \
     bioconda::bioconductor-pd.hg.u133.plus.2 \
+    bioconda::bioconductor-hgu133plus2.db \
     bioconda::bioconductor-affy \
     conda-forge::r-ggextra \
     bioconda::bioconductor-glmgampoi \
