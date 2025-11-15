@@ -10,7 +10,7 @@ github_packages <-  read.table(file.path(script_dir, "devtools_packages.txt"),
 
 
 
-BiocManager::install("pd.hg.u133.plus.2")
+# BiocManager::install("pd.hg.u133.plus.2")
 
 
 tryCatch({
