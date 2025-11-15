@@ -24,7 +24,7 @@ RUN micromamba install -y \
     bioconda::bioconductor-enhancedvolcano \
     bioconda::bioconductor-genefilter \
     bioconda::bioconductor-geoquery \
-    bioconda::bioconductor-ggextra \
+    conda-forge::r-ggextra \
     bioconda::bioconductor-glmgampoi \
     bioconda::bioconductor-gosemsim \
     bioconda::bioconductor-gseabase \
@@ -61,7 +61,7 @@ RUN micromamba install -y \
     conda-forge::r-prroc \
     conda-forge::r-purrr \
     conda-forge::r-rcolorbrewer \
-    conda-forge::r-rcy3 \
+    bioconda::bioconductor-rcy3 \
     conda-forge::r-readr \
     conda-forge::r-rlang \
     conda-forge::r-rmarkdown \
