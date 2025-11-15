@@ -61,7 +61,7 @@ RUN micromamba install -y \
     conda-forge::r-prroc \
     conda-forge::r-purrr \
     conda-forge::r-rcolorbrewer \
-    conda-forge::r-rcy3
+    conda-forge::r-rcy3 \
     conda-forge::r-readr \
     conda-forge::r-rlang \
     conda-forge::r-rmarkdown \
