@@ -15,6 +15,7 @@ RUN micromamba install -y \
     conda-forge::r-dplyr \
     conda-forge::r-ggpubr \
     conda-forge::r-ggsci \
+    conda-forge::libopenblas=0.3.3 \
     conda-forge::r-tidyr \
     conda-forge::r-tibble \
     conda-forge::r-devtools \
