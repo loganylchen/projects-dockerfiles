@@ -28,6 +28,7 @@ RUN micromamba install -y \
     bioconda::bioconductor-hgu133plus2.db \
     bioconda::bioconductor-affy \
     conda-forge::r-ggextra \
+    conda-forge::libopenblas=0.3.6 \
     bioconda::bioconductor-glmgampoi \
     bioconda::bioconductor-gosemsim \
     bioconda::bioconductor-gseabase \
