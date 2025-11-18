@@ -87,7 +87,7 @@ RUN micromamba run -n base Rscript /tmp/install_packages.R &&\
     git config --global user.email "yuelong.chen.btr@gmail.com" && \
     groupadd --gid $USER_GID loganvscode && \
     useradd -u $USER_UID -g $USER_NAME -s /bin/bash -m $USER_NAME  && \
-    chmod 777 -R /opt && \
+    chmod 777 -R /opt/conda/lib/R/library && \
     apt autoremove && \
     apt clean && \
     apt autoclean && \
