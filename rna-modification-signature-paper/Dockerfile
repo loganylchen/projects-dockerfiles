@@ -56,6 +56,7 @@ RUN micromamba install -y \
     conda-forge::r-ggsci \
     conda-forge::r-ggvenndiagram \
     conda-forge::r-glmnet \
+    conda-forge::r-vegan \
     conda-forge::r-igraph \
     conda-forge::r-irkernel \
     conda-forge::r-knitr \
