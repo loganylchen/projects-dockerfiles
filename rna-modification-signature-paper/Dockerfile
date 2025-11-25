@@ -33,6 +33,7 @@ RUN micromamba install -y \
     conda-forge::libopenblas=0.3.6 \
     bioconda::bioconductor-glmgampoi \
     bioconda::bioconductor-gosemsim \
+    bioconda::bioconductor-oligo \
     bioconda::bioconductor-gseabase \
     bioconda::bioconductor-gsva \
     bioconda::bioconductor-impute \
