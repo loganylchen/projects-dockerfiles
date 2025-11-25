@@ -12,7 +12,7 @@ github_packages <-  read.table(file.path(script_dir, "devtools_packages.txt"),
 
 # BiocManager::install("pd.hg.u133.plus.2")
 BiocManager::install("oligo")
-
+install.packages('forestplot')
 tryCatch({
     lapply(github_packages$V1, function(pkg) devtools::install_github(pkg))
 }, error = function(e) {
