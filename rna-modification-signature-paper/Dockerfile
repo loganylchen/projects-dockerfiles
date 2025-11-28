@@ -103,8 +103,11 @@ ENV ANTHROPIC_DEFAULT_SONNET_MODEL=kimi-k2-thinking-turbo
 ENV ANTHROPIC_DEFAULT_HAIKU_MODEL=kimi-k2-thinking-turbo
 ENV CLAUDE_CODE_SUBAGENT_MODEL=kimi-k2-thinking-turbo 
 
-RUN micromamba run -n base bash /tmp/install_claude_code.bash && \
-    apt autoremove && \
+RUN micromamba run -n base bash /tmp/install_claude_code.bash 
+USER root 
+RUN apt autoremove && \
     apt clean && \
     apt autoclean && \
     rm -rf /tmp/*
+
+USER $USER_NAME 
