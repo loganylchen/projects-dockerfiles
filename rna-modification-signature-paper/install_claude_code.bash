@@ -1,6 +1,6 @@
 curl -fsSL https://fnm.vercel.app/install | bash
 
-source ~/.bashrc
+. root/.bashrc
 # 新开一个terminal，让 fnm 生效
 fnm install 24.3.0
 fnm default 24.3.0
