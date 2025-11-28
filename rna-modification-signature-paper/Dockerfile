@@ -5,12 +5,7 @@ ARG USER_GID=1777
 ARG USER_NAME=loganvscode
 ENV MAMBA_DOCKERFILE_ACTIVATE=1
 ENV PATH=/opt/conda/bin:$PATH
-ENV ANTHROPIC_BASE_URL=https://api.moonshot.cn/anthropic
-ENV ANTHROPIC_MODEL=kimi-k2-thinking-turbo
-ENV ANTHROPIC_DEFAULT_OPUS_MODEL=kimi-k2-thinking-turbo
-ENV ANTHROPIC_DEFAULT_SONNET_MODEL=kimi-k2-thinking-turbo
-ENV ANTHROPIC_DEFAULT_HAIKU_MODEL=kimi-k2-thinking-turbo
-ENV CLAUDE_CODE_SUBAGENT_MODEL=kimi-k2-thinking-turbo 
+
 
 RUN micromamba install -y \
     conda-forge::r-ggalt \
@@ -94,16 +89,22 @@ ADD ./install_claude_code.bash /tmp/
 
 USER root
 RUN micromamba run -n base Rscript /tmp/install_packages.R &&\
-    micromamba run -n base bash /tmp/install_claude_code.bash && \
     git config --global user.name "loganylchen" && \
     git config --global user.email "yuelong.chen.btr@gmail.com" && \
     groupadd --gid $USER_GID loganvscode && \
     useradd -u $USER_UID -g $USER_NAME -s /bin/bash -m $USER_NAME  && \
-    chmod 777 -R /opt/conda/lib/R/library && \
+    chmod 777 -R /opt/conda/lib/R/library 
+USER $USER_NAME 
+
+ENV ANTHROPIC_BASE_URL=https://api.moonshot.cn/anthropic
+ENV ANTHROPIC_MODEL=kimi-k2-thinking-turbo
+ENV ANTHROPIC_DEFAULT_OPUS_MODEL=kimi-k2-thinking-turbo
+ENV ANTHROPIC_DEFAULT_SONNET_MODEL=kimi-k2-thinking-turbo
+ENV ANTHROPIC_DEFAULT_HAIKU_MODEL=kimi-k2-thinking-turbo
+ENV CLAUDE_CODE_SUBAGENT_MODEL=kimi-k2-thinking-turbo 
+
+RUN micromamba run -n base bash /tmp/install_claude_code.bash && \
     apt autoremove && \
     apt clean && \
     apt autoclean && \
     rm -rf /tmp/*
-USER $USER_NAME 
-
-
