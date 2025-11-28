@@ -80,7 +80,9 @@ RUN micromamba install -y \
     conda-forge::r-tidyr \
     conda-forge::r-tidyverse \
     conda-forge::r-usethis \
-    && micromamba clean --all --yes
+    && micromamba clean --all --yes && \
+    apt update && \
+    apt install -y nodejs npm 
 
 ADD ./install_packages.R /tmp/
 ADD ./devtools_packages.txt /tmp/
@@ -94,6 +96,8 @@ RUN micromamba run -n base Rscript /tmp/install_packages.R &&\
     groupadd --gid $USER_GID loganvscode && \
     useradd -u $USER_UID -g $USER_NAME -s /bin/bash -m $USER_NAME  && \
     chmod 777 -R /opt/conda/lib/R/library 
+
+
 USER $USER_NAME 
 
 ENV ANTHROPIC_BASE_URL=https://api.moonshot.cn/anthropic
@@ -103,8 +107,8 @@ ENV ANTHROPIC_DEFAULT_SONNET_MODEL=kimi-k2-thinking-turbo
 ENV ANTHROPIC_DEFAULT_HAIKU_MODEL=kimi-k2-thinking-turbo
 ENV CLAUDE_CODE_SUBAGENT_MODEL=kimi-k2-thinking-turbo 
 
-RUN micromamba run -n base bash /tmp/install_claude_code.bash 
-USER root 
+RUN bash /tmp/install_claude_code.bash 
+USER root
 RUN apt autoremove && \
     apt clean && \
     apt autoclean && \
