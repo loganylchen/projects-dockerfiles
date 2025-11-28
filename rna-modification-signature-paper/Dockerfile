@@ -80,9 +80,7 @@ RUN micromamba install -y \
     conda-forge::r-tidyr \
     conda-forge::r-tidyverse \
     conda-forge::r-usethis \
-    && micromamba clean --all --yes && \
-    apt update && \
-    apt install -y nodejs npm 
+    && micromamba clean --all --yes 
 
 ADD ./install_packages.R /tmp/
 ADD ./devtools_packages.txt /tmp/
@@ -95,7 +93,9 @@ RUN micromamba run -n base Rscript /tmp/install_packages.R &&\
     git config --global user.email "yuelong.chen.btr@gmail.com" && \
     groupadd --gid $USER_GID loganvscode && \
     useradd -u $USER_UID -g $USER_NAME -s /bin/bash -m $USER_NAME  && \
-    chmod 777 -R /opt/conda/lib/R/library 
+    chmod 777 -R /opt/conda/lib/R/library && \
+    apt update && \
+    apt install -y nodejs npm 
 
 
 USER $USER_NAME 
