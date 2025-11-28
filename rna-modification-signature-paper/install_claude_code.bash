@@ -1,13 +1,5 @@
-curl -fsSL https://fnm.vercel.app/install | bash
+npm install -g @anthropic-ai/claude-code
 
-. root/.bashrc
-# 新开一个terminal，让 fnm 生效
-fnm install 24.3.0
-fnm default 24.3.0
-fnm use 24.3.0
- 
-# 安装 claude-code
-npm install -g @anthropic-ai/claude-code --registry=https://registry.npmmirror.com
  
 # 初始化配置
 node --eval "
