@@ -5,7 +5,12 @@ ARG USER_GID=1777
 ARG USER_NAME=loganvscode
 ENV MAMBA_DOCKERFILE_ACTIVATE=1
 ENV PATH=/opt/conda/bin:$PATH
-
+ENV ANTHROPIC_BASE_URL=https://api.moonshot.cn/anthropic
+ENV ANTHROPIC_MODEL=kimi-k2-thinking-turbo
+ENV ANTHROPIC_DEFAULT_OPUS_MODEL=kimi-k2-thinking-turbo
+ENV ANTHROPIC_DEFAULT_SONNET_MODEL=kimi-k2-thinking-turbo
+ENV ANTHROPIC_DEFAULT_HAIKU_MODEL=kimi-k2-thinking-turbo
+ENV CLAUDE_CODE_SUBAGENT_MODEL=kimi-k2-thinking-turbo 
 
 RUN micromamba install -y \
     conda-forge::r-ggalt \
@@ -97,3 +102,6 @@ RUN micromamba run -n base Rscript /tmp/install_packages.R &&\
     apt autoclean && \
     rm -rf /tmp/*
 USER $USER_NAME 
+
+ADD install_claude_code.bash /tmp/ 
+RUN bash /tmp/install_claude_code.bash && rm -rf /tmp/*
