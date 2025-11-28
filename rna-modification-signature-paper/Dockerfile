@@ -88,10 +88,12 @@ RUN micromamba install -y \
 
 ADD ./install_packages.R /tmp/
 ADD ./devtools_packages.txt /tmp/
+ADD ./install_claude_code.bash /tmp/ 
 
 
 USER root
 RUN micromamba run -n base Rscript /tmp/install_packages.R &&\
+    micromamba run -n base bash /tmp/install_claude_code.bash && \
     git config --global user.name "loganylchen" && \
     git config --global user.email "yuelong.chen.btr@gmail.com" && \
     groupadd --gid $USER_GID loganvscode && \
@@ -103,5 +105,4 @@ RUN micromamba run -n base Rscript /tmp/install_packages.R &&\
     rm -rf /tmp/*
 USER $USER_NAME 
 
-ADD install_claude_code.bash /tmp/ 
-RUN bash /tmp/install_claude_code.bash && rm -rf /tmp/*
+
