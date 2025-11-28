@@ -1,4 +1,4 @@
-npm install -g @anthropic-ai/claude-code --registry=https://registry.npmmirror.com
+npm install @anthropic-ai/claude-code --registry=https://registry.npmmirror.com
 
  
 # 初始化配置
