@@ -18,6 +18,7 @@ RUN micromamba install -y \
     conda-forge::git \
     anaconda::jupyter \
     conda-forge::r-vip \
+    conda-forge::nodejs \
     bioconda::bioconductor-annotationdbi \
     bioconda::bioconductor-biobase \
     bioconda::bioconductor-biocstyle \
