@@ -9,9 +9,13 @@ ENV PATH=/opt/conda/bin:$PATH
 
 RUN micromamba install -y \
     conda-forge::r-ggalt \
+    conda-forge::r-forestplot \
     conda-forge::git \
     anaconda::jupyter \
     conda-forge::r-vip \
+    conda-forge::nodejs \
+    r::r-nloptr \
+    conda-forge::r-xml2 \
     bioconda::bioconductor-annotationdbi \
     bioconda::bioconductor-biobase \
     bioconda::bioconductor-biocstyle \
@@ -32,6 +36,7 @@ RUN micromamba install -y \
     conda-forge::libopenblas=0.3.6 \
     bioconda::bioconductor-glmgampoi \
     bioconda::bioconductor-gosemsim \
+    bioconda::bioconductor-oligo \
     bioconda::bioconductor-gseabase \
     bioconda::bioconductor-gsva \
     bioconda::bioconductor-impute \
@@ -77,10 +82,11 @@ RUN micromamba install -y \
     conda-forge::r-tidyr \
     conda-forge::r-tidyverse \
     conda-forge::r-usethis \
-    && micromamba clean --all --yes
+    && micromamba clean --all --yes 
 
 ADD ./install_packages.R /tmp/
 ADD ./devtools_packages.txt /tmp/
+ADD ./install_claude_code.bash /tmp/ 
 
 
 USER root
@@ -90,8 +96,24 @@ RUN micromamba run -n base Rscript /tmp/install_packages.R &&\
     groupadd --gid $USER_GID loganvscode && \
     useradd -u $USER_UID -g $USER_NAME -s /bin/bash -m $USER_NAME  && \
     chmod 777 -R /opt/conda/lib/R/library && \
-    apt autoremove && \
+    apt update && \
+    apt install -y nodejs npm 
+
+
+USER $USER_NAME 
+
+ENV ANTHROPIC_BASE_URL=https://api.moonshot.cn/anthropic
+ENV ANTHROPIC_MODEL=kimi-k2-thinking-turbo
+ENV ANTHROPIC_DEFAULT_OPUS_MODEL=kimi-k2-thinking-turbo
+ENV ANTHROPIC_DEFAULT_SONNET_MODEL=kimi-k2-thinking-turbo
+ENV ANTHROPIC_DEFAULT_HAIKU_MODEL=kimi-k2-thinking-turbo
+ENV CLAUDE_CODE_SUBAGENT_MODEL=kimi-k2-thinking-turbo 
+
+RUN bash /tmp/install_claude_code.bash 
+USER root
+RUN apt autoremove && \
     apt clean && \
     apt autoclean && \
     rm -rf /tmp/*
+
 USER $USER_NAME 
