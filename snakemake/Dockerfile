@@ -6,7 +6,7 @@ ARG USER_NAME=loganvscode
 
 
 ADD requirements.txt /tmp/
-RUN pip install -r /tmp/requirements.txt 
+RUN pip install -r /tmp/requirements.txt && curl -fsSL https://claude.ai/install.sh | bash 
 RUN git config --global user.name "loganylchen" && \
     git config --global user.email "yuelong.chen.btr@gmail.com" && \
     groupadd --gid $USER_GID loganvscode && \
