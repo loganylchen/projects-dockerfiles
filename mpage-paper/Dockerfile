@@ -11,7 +11,8 @@ ADD CRAN_packages.txt /tmp/
 ADD requirements.txt /tmp/
 
 
-RUN Rscript /tmp/install_packages.R  && \
+RUN curl -fsSL https://opencode.ai/install | bash && \
+    Rscript /tmp/install_packages.R  && \
     pip install -r /tmp/requirements.txt 
 
 ADD this.R /tmp/
