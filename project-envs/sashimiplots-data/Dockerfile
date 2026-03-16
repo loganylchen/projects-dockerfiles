@@ -17,7 +17,7 @@ ARG RMATS_VERSION=4.3.0
 # PATH
 ENV PATH=/opt/bin:/opt/rmats/:${PATH}
 
-# Install system dependencies
+# Install system dependencies (excluding R, installed separately from CRAN repo)
 RUN apt-get update && apt-get install -y \
     wget \
     curl \
@@ -50,33 +50,30 @@ RUN apt-get update && apt-get install -y \
     pigz \
     parallel \
     bedtools \
-    gcc build-essential   python3-pip \
     ca-certificates \
-    cmake \
-    curl \
     cython3 \
     g++ \
     gfortran \
-    git \
     libblas-dev \
     libgsl-dev \
     liblapack-dev \
     make \
     python-is-python3 \
-    python3-dev \
-    r-base \
-    r-cran-doparallel \
-    r-cran-dosnow \
-    r-cran-foreach \
-    r-cran-getopt \
-    r-cran-ggplot2 \
-    r-cran-iterators \
-    r-cran-mixtools \
-    r-cran-nloptr \
-    r-cran-rcpp \
-    zlib1g-dev \
+    software-properties-common \
+    dirmngr \
+    gnupg2 \
     && update-alternatives --install /usr/bin/python python /usr/bin/python3.10 1 \
     && update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 1 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install R from CRAN repository (Ubuntu 22.04 ships R 4.1.2 which is too old for Hmisc >= 5.0)
+RUN wget -qO- https://cloud.r-project.org/bin/linux/ubuntu/marutter_pubkey.asc | \
+    gpg --dearmor -o /usr/share/keyrings/r-project.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/r-project.gpg] https://cloud.r-project.org/bin/linux/ubuntu jammy-cran40/" > \
+    /etc/apt/sources.list.d/r-project.list && \
+    apt-get update && apt-get install -y \
+    r-base \
+    r-base-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Create working directories
@@ -94,7 +91,7 @@ RUN git clone https://github.com/gpertea/gffread.git && \
 
 
 # Install R packages
-RUN R -e "install.packages(c('BiocManager', 'devtools', 'data.table', 'dplyr', 'ggplot2', 'optparse','remotes','pak'), repos='https://cloud.r-project.org/')"
+RUN R -e "install.packages(c('BiocManager', 'devtools', 'data.table', 'dplyr', 'ggplot2', 'optparse', 'remotes', 'pak', 'doParallel', 'doSNOW', 'foreach', 'getopt', 'iterators', 'mixtools', 'nloptr', 'Rcpp'), repos='https://cloud.r-project.org/')"
 
 # Install Bioconductor packages for DEXSeq and JunctionSeq
 RUN R -e "BiocManager::install(c('DEXSeq', 'JunctionSeq', 'GenomicRanges', 'GenomicFeatures', 'Rsamtools', 'rtracklayer', 'GenomicAlignments'), ask=FALSE, update=FALSE)"
