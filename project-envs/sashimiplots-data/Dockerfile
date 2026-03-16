@@ -32,6 +32,7 @@ RUN apt-get update && apt-get install -y \
     libcurl4-openssl-dev \
     libssl-dev \
     libxml2-dev \
+    libwebp-dev \
     libfontconfig1-dev \
     libfreetype6-dev \
     libpng-dev \
@@ -189,7 +190,8 @@ RUN pip3 install --no-cache-dir SUPPA==2.3
 WORKDIR /tools
 
 # Install Leafcutter R package
-RUN R -e "pak::pak('stan-dev/rstantools');pak::pak('davidaknowles/leafcutter/leafcutter')"
+RUN R -e "pak::pak('stan-dev/rstantools')"
+RUN R -e "pak::pak('davidaknowles/leafcutter/leafcutter')"
 
 # ============================================
 # Install MISO (Mixture of Isoforms)
