@@ -93,7 +93,7 @@ RUN git clone https://github.com/gpertea/gffread.git && \
 
 
 # Install R packages
-RUN R -e "install.packages(c('BiocManager', 'devtools', 'data.table', 'dplyr', 'ggplot2', 'optparse'), repos='https://cloud.r-project.org/')"
+RUN R -e "install.packages(c('BiocManager', 'devtools', 'data.table', 'dplyr', 'ggplot2', 'optparse','remotes','pak'), repos='https://cloud.r-project.org/')"
 
 # Install Bioconductor packages for DEXSeq and JunctionSeq
 RUN R -e "BiocManager::install(c('DEXSeq', 'JunctionSeq', 'GenomicRanges', 'GenomicFeatures', 'Rsamtools', 'rtracklayer', 'GenomicAlignments'), ask=FALSE, update=FALSE)"
@@ -189,7 +189,7 @@ RUN pip3 install --no-cache-dir SUPPA==2.3
 WORKDIR /tools
 
 # Install Leafcutter R package
-RUN R -e "devtools::install_github('stan-dev/rstantools');devtools::install_github('davidaknowles/leafcutter/leafcutter')"
+RUN R -e "pak::pak('stan-dev/rstantools');pak::pak('davidaknowles/leafcutter/leafcutter')"
 
 # ============================================
 # Install MISO (Mixture of Isoforms)
