@@ -187,13 +187,9 @@ RUN pip3 install --no-cache-dir SUPPA==2.3
 # Install Leafcutter
 # ============================================
 WORKDIR /tools
-RUN git clone https://github.com/davidaknowles/leafcutter.git && \
-    cd leafcutter && \
-    pip3 install -r requirements.txt || true
-ENV PATH="/tools/leafcutter/scripts:/tools/leafcutter/clustering:${PATH}"
 
 # Install Leafcutter R package
-RUN R -e "devtools::install_github('davidaknowles/leafcutter/leafcutter')"
+RUN R -e "devtools::install_github('stan-dev/rstantools');devtools::install_github('davidaknowles/leafcutter/leafcutter')"
 
 # ============================================
 # Install MISO (Mixture of Isoforms)
