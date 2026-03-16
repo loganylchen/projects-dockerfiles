@@ -38,6 +38,7 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libtiff5-dev \
     libtbb-dev \
+    libtbb2 \
     libjpeg-dev \
     libharfbuzz-dev \
     libfribidi-dev \
