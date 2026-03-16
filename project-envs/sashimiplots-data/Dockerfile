@@ -183,14 +183,14 @@ RUN cd /tmp/ && \
 # ============================================
 RUN pip3 install --no-cache-dir SUPPA==2.3
 
-# ============================================
-# Install Leafcutter
-# ============================================
-WORKDIR /tools
+# # ============================================
+# # Install Leafcutter
+# # ============================================
+# WORKDIR /tools
 
-# Install Leafcutter R package
-RUN R -e "pak::pak('stan-dev/rstantools')"
-RUN R -e "pak::pak('davidaknowles/leafcutter/leafcutter')"
+# # Install Leafcutter R package
+# RUN R -e "pak::pak('stan-dev/rstantools')"
+# RUN R -e "pak::pak('davidaknowles/leafcutter/leafcutter')"
 
 # ============================================
 # Install MISO (Mixture of Isoforms)
