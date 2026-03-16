@@ -37,6 +37,7 @@ RUN apt-get update && apt-get install -y \
     libfreetype6-dev \
     libpng-dev \
     libtiff5-dev \
+    libtbb-dev \
     libjpeg-dev \
     libharfbuzz-dev \
     libfribidi-dev \
