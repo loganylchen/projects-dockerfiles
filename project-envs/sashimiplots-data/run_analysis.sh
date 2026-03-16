@@ -325,7 +325,7 @@ if [[ ${RUN_JUNCTION_EXTRACT} -eq 1 ]]; then
         log "Extracting junctions: ${sample}"
         
         regtools junctions extract \
-            -s 0 \
+            -s "${STRANDNESS}" \
             -a 8 \
             -m 50 \
             -M 500000 \
@@ -570,7 +570,7 @@ if [[ ${RUN_LEAFCUTTER} -eq 1 ]]; then
             # Use regtools to extract junctions
             if [[ ! -f "${LEAFCUTTER_DIR}/${sample}.junc" ]]; then
                 regtools junctions extract \
-                    -s 0 \
+                    -s "${STRANDNESS}" \
                     -a 8 \
                     -m 50 \
                     -M ${LEAFCUTTER_INTRON_MAX} \
@@ -729,12 +729,19 @@ if [[ ${RUN_MAJIQ} -eq 1 ]]; then
                 fi
             done
             
+            # Map regtools strandness to MAJIQ format
+            case "${STRANDNESS}" in
+                RF) majiq_strand="reverse" ;;
+                FR) majiq_strand="forward" ;;
+                *)  majiq_strand="None" ;;
+            esac
+
             cat > "${majiq_config}" << EOF
 [info]
 readlen=${READ_LENGTH}
 samdir=${ALIGNED_DIR}
 genome=custom
-strandness=None
+strandness=${majiq_strand}
 
 [experiments]
 ${CONDITION1}=${cond1_samples}

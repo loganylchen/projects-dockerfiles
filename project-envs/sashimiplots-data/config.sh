@@ -116,6 +116,11 @@ HISAT2_OPTS="--dta --no-mixed --no-discordant"
 # Read length (for rMATS)
 READ_LENGTH=150
 
+# Library strandness for regtools (v1.0.0+)
+# Valid values: XS (unstranded/use XS tags), RF (first-strand), FR (second-strand), intron-motif
+# Most Illumina TruSeq stranded kits use RF; unstranded kits use XS
+STRANDNESS="XS"
+
 # rMATS parameters
 RMATS_OPTS="--novelSS --mil 50 --mel 500"
 
