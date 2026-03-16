@@ -1,0 +1,221 @@
+name: Build Project Envs
+
+on:
+  push:
+    paths:
+      - 'project-envs/**'
+  workflow_dispatch:
+    inputs:
+      project:
+        description: 'Project to build (leave empty to build all changed)'
+        required: false
+        type: string
+
+env:
+  DOCKER_USER: ${{ secrets.DH_USER }}
+
+jobs:
+  detect:
+    name: Detect changed projects
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      has_projects: ${{ steps.set-matrix.outputs.has_projects }}
+      timestamp: ${{ steps.timestamp.outputs.value }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Get build timestamp (HKT)
+        id: timestamp
+        run: echo "value=$(TZ=Asia/Hong_Kong date +'%Y%m%d%H%M')" >> "$GITHUB_OUTPUT"
+
+      - name: Determine changed projects
+        id: set-matrix
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && -n "${{ inputs.project }}" ]]; then
+            # Manual trigger with specific project
+            projects='["${{ inputs.project }}"]'
+          else
+            # Detect changed directories under project-envs/
+            projects=$(git diff --name-only HEAD~1 HEAD -- 'project-envs/' \
+              | cut -d'/' -f2 \
+              | sort -u \
+              | jq -R -s -c 'split("\n") | map(select(length > 0))')
+          fi
+
+          echo "Detected projects: $projects"
+
+          if [[ "$projects" == "[]" || -z "$projects" ]]; then
+            echo "has_projects=false" >> "$GITHUB_OUTPUT"
+            echo "matrix={\"project\":[]}" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_projects=true" >> "$GITHUB_OUTPUT"
+            echo "matrix={\"project\":$projects}" >> "$GITHUB_OUTPUT"
+          fi
+
+  build-amd64:
+    name: "Build amd64 — ${{ matrix.project }}"
+    needs: detect
+    if: needs.detect.outputs.has_projects == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.detect.outputs.matrix) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Docker storage
+        run: |
+          sudo mkdir -p /mnt/docker
+          sudo chmod 777 /mnt/docker
+          sudo mkdir -p /etc/docker
+          sudo cp daemon.json /etc/docker/daemon.json
+          sudo systemctl restart docker
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DH_USER }}
+          password: ${{ secrets.DH_TOKEN }}
+
+      - name: Build and push
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: ./project-envs/${{ matrix.project }}/
+          platforms: linux/amd64
+          tags: ${{ env.DOCKER_USER }}/env-${{ matrix.project }}
+          cache-from: type=registry,ref=${{ env.DOCKER_USER }}/env-${{ matrix.project }}:amd64-cache
+          cache-to: type=registry,ref=${{ env.DOCKER_USER }}/env-${{ matrix.project }}:amd64-cache,mode=max
+          outputs: type=image,push-by-digest=true,name-canonical=true,push=true
+
+      - name: Export digest
+        run: |
+          mkdir -p "${{ runner.temp }}/digests"
+          digest="${{ steps.build.outputs.digest }}"
+          touch "${{ runner.temp }}/digests/${digest#sha256:}"
+
+      - name: Upload digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-amd64-${{ matrix.project }}
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  build-arm64:
+    name: "Build arm64 — ${{ matrix.project }}"
+    needs: detect
+    if: needs.detect.outputs.has_projects == 'true'
+    runs-on: ubuntu-22.04-arm
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.detect.outputs.matrix) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Docker storage
+        run: |
+          sudo mkdir -p /mnt/docker
+          sudo chmod 777 /mnt/docker
+          sudo mkdir -p /etc/docker
+          sudo cp daemon.json /etc/docker/daemon.json
+          sudo systemctl restart docker
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DH_USER }}
+          password: ${{ secrets.DH_TOKEN }}
+
+      - name: Build and push
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: ./project-envs/${{ matrix.project }}/
+          platforms: linux/arm64
+          tags: ${{ env.DOCKER_USER }}/env-${{ matrix.project }}
+          cache-from: type=registry,ref=${{ env.DOCKER_USER }}/env-${{ matrix.project }}:arm64-cache
+          cache-to: type=registry,ref=${{ env.DOCKER_USER }}/env-${{ matrix.project }}:arm64-cache,mode=max
+          outputs: type=image,push-by-digest=true,name-canonical=true,push=true
+
+      - name: Export digest
+        run: |
+          mkdir -p "${{ runner.temp }}/digests"
+          digest="${{ steps.build.outputs.digest }}"
+          touch "${{ runner.temp }}/digests/${digest#sha256:}"
+
+      - name: Upload digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-arm64-${{ matrix.project }}
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  merge:
+    name: "Merge manifest — ${{ matrix.project }}"
+    needs:
+      - detect
+      - build-amd64
+      - build-arm64
+    if: needs.detect.outputs.has_projects == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.detect.outputs.matrix) }}
+    steps:
+      - name: Download amd64 digest
+        uses: actions/download-artifact@v4
+        with:
+          name: digests-amd64-${{ matrix.project }}
+          path: ${{ runner.temp }}/digests
+
+      - name: Download arm64 digest
+        uses: actions/download-artifact@v4
+        with:
+          name: digests-arm64-${{ matrix.project }}
+          path: ${{ runner.temp }}/digests
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DH_USER }}
+          password: ${{ secrets.DH_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Create manifest list and push
+        env:
+          REGISTRY_IMAGE: ${{ env.DOCKER_USER }}/env-${{ matrix.project }}
+          TIMESTAMP: ${{ needs.detect.outputs.timestamp }}
+        working-directory: ${{ runner.temp }}/digests
+        run: |
+          docker buildx imagetools create \
+            -t "${REGISTRY_IMAGE}:latest" \
+            -t "${REGISTRY_IMAGE}:${TIMESTAMP}" \
+            $(printf "${REGISTRY_IMAGE}@sha256:%s " *)
+
+      - name: Inspect image
+        env:
+          REGISTRY_IMAGE: ${{ env.DOCKER_USER }}/env-${{ matrix.project }}
+        run: |
+          docker buildx imagetools inspect "${REGISTRY_IMAGE}:latest"
