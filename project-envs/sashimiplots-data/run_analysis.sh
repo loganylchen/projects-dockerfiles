@@ -341,14 +341,14 @@ fi
 if [[ ${RUN_COUNTS} -eq 1 ]]; then
     log_step "Counting reads with featureCounts"
     
+    BAM_FILES=""
+    for sample in "${!SAMPLES[@]}"; do
+        BAM_FILES="${BAM_FILES} ${ALIGNED_DIR}/${sample}.sorted.bam"
+    done
+    
     if [[ -f "${COUNTS_DIR}/gene_counts.txt" ]]; then
         log "Gene counts already exist, skipping..."
     else
-        BAM_FILES=""
-        for sample in "${!SAMPLES[@]}"; do
-            BAM_FILES="${BAM_FILES} ${ALIGNED_DIR}/${sample}.sorted.bam"
-        done
-        
         featureCounts \
             -T ${THREADS} \
             -p \
@@ -357,7 +357,11 @@ if [[ ${RUN_COUNTS} -eq 1 ]]; then
             -o "${COUNTS_DIR}/gene_counts.txt" \
             ${BAM_FILES} \
             2>&1 | tee "${LOGS_DIR}/featureCounts_gene.log"
-        
+    fi
+    
+    if [[ -f "${COUNTS_DIR}/exon_counts.txt" ]]; then
+        log "Exon counts already exist, skipping..."
+    else
         featureCounts \
             -T ${THREADS} \
             -p \
@@ -487,42 +491,58 @@ if [[ ${RUN_SUPPA2} -eq 1 ]]; then
     done
     
     # Run differential splicing analysis
-    log "Running SUPPA2 differential analysis..."
-    
-    # Create condition-specific sample lists
-    cond1_cols=""
-    cond2_cols=""
-    col_idx=1
-    for sample in "${!SAMPLES[@]}"; do
-        if [[ "${SAMPLES[$sample]}" == "${CONDITION1}" ]]; then
-            cond1_cols="${cond1_cols},${col_idx}"
-        else
-            cond2_cols="${cond2_cols},${col_idx}"
-        fi
-        ((col_idx++))
-    done
-    cond1_cols="${cond1_cols#,}"
-    cond2_cols="${cond2_cols#,}"
-    
+    # Check if all dpsi files already exist
+    _suppa2_diff_done=true
     for event_file in "${SUPPA2_DIR}"/events*.ioe; do
         if [[ -f "${event_file}" ]]; then
             event_type=$(basename "${event_file}" .ioe | sed 's/events_//')
-            
             if [[ -f "${SUPPA2_DIR}/${event_type}.psi" ]] && [[ ! -f "${SUPPA2_DIR}/diff_${event_type}.dpsi" ]]; then
-                log "Differential analysis for ${event_type}..."
-                
-                # Split PSI and TPM by condition
-                # This is a simplified approach - you may need to adjust
-                suppa.py diffSplice \
-                    -m empirical \
-                    -i "${event_file}" \
-                    -p "${SUPPA2_DIR}/${event_type}.psi" "${SUPPA2_DIR}/${event_type}.psi" \
-                    -e "${SUPPA2_DIR}/tpm_matrix.txt" "${SUPPA2_DIR}/tpm_matrix.txt" \
-                    -o "${SUPPA2_DIR}/diff_${event_type}" \
-                    2>&1 | tee -a "${LOGS_DIR}/suppa2_diff.log" || true
+                _suppa2_diff_done=false
+                break
             fi
         fi
     done
+    
+    if [[ "${_suppa2_diff_done}" == true ]]; then
+        log "SUPPA2 differential analysis already done, skipping..."
+    else
+        log "Running SUPPA2 differential analysis..."
+        
+        # Create condition-specific sample lists
+        cond1_cols=""
+        cond2_cols=""
+        col_idx=1
+        for sample in "${!SAMPLES[@]}"; do
+            if [[ "${SAMPLES[$sample]}" == "${CONDITION1}" ]]; then
+                cond1_cols="${cond1_cols},${col_idx}"
+            else
+                cond2_cols="${cond2_cols},${col_idx}"
+            fi
+            ((col_idx++))
+        done
+        cond1_cols="${cond1_cols#,}"
+        cond2_cols="${cond2_cols#,}"
+        
+        for event_file in "${SUPPA2_DIR}"/events*.ioe; do
+            if [[ -f "${event_file}" ]]; then
+                event_type=$(basename "${event_file}" .ioe | sed 's/events_//')
+                
+                if [[ -f "${SUPPA2_DIR}/${event_type}.psi" ]] && [[ ! -f "${SUPPA2_DIR}/diff_${event_type}.dpsi" ]]; then
+                    log "Differential analysis for ${event_type}..."
+                    
+                    # Split PSI and TPM by condition
+                    # This is a simplified approach - you may need to adjust
+                    suppa.py diffSplice \
+                        -m empirical \
+                        -i "${event_file}" \
+                        -p "${SUPPA2_DIR}/${event_type}.psi" "${SUPPA2_DIR}/${event_type}.psi" \
+                        -e "${SUPPA2_DIR}/tpm_matrix.txt" "${SUPPA2_DIR}/tpm_matrix.txt" \
+                        -o "${SUPPA2_DIR}/diff_${event_type}" \
+                        2>&1 | tee -a "${LOGS_DIR}/suppa2_diff.log" || true
+                fi
+            fi
+        done
+    fi
     
     log "SUPPA2 output files:"
     ls -la "${SUPPA2_DIR}"/*.psi "${SUPPA2_DIR}"/*.dpsi 2>/dev/null || true
@@ -580,22 +600,24 @@ if [[ ${RUN_LEAFCUTTER} -eq 1 ]]; then
             }
     fi
     
-    # Create groups file for differential analysis
-    groups_file="${LEAFCUTTER_DIR}/groups.txt"
-    > "${groups_file}"
-    for sample in "${!SAMPLES[@]}"; do
-        echo -e "${sample}\t${SAMPLES[$sample]}" >> "${groups_file}"
-    done
-    
     # Run differential splicing analysis
-    if [[ -f "${LEAFCUTTER_DIR}/leafcutter_perind_numers.counts.gz" ]]; then
+    if [[ -f "${LEAFCUTTER_DIR}/leafcutter_ds_cluster_significance.txt" ]]; then
+        log "Leafcutter differential analysis results already exist, skipping..."
+    elif [[ -f "${LEAFCUTTER_DIR}/leafcutter_perind_numers.counts.gz" ]]; then
+        # Create groups file for differential analysis
+        groups_file="${LEAFCUTTER_DIR}/groups.txt"
+        > "${groups_file}"
+        for sample in "${!SAMPLES[@]}"; do
+            echo -e "${sample}\t${SAMPLES[$sample]}" >> "${groups_file}"
+        done
+        
         log "Running Leafcutter differential intron usage analysis..."
         
         Rscript -e "
         library(leafcutter)
         
         counts_file <- '${LEAFCUTTER_DIR}/leafcutter_perind_numers.counts.gz'
-        groups_file <- '${groups_file}'
+        groups_file <- '${LEAFCUTTER_DIR}/groups.txt'
         output_prefix <- '${LEAFCUTTER_DIR}/leafcutter_ds'
         
         tryCatch({
@@ -720,30 +742,42 @@ ${CONDITION2}=${cond2_samples}
 EOF
             
             # Build MAJIQ database
-            log "Building MAJIQ database..."
-            majiq build "${GTF_FILE}" \
-                -c "${majiq_config}" \
-                -j ${THREADS} \
-                -o "${MAJIQ_DIR}/build" \
-                2>&1 | tee "${LOGS_DIR}/majiq_build.log"
+            if [[ -f "${MAJIQ_DIR}/build/splicegraph.sql" ]]; then
+                log "MAJIQ database already built, skipping..."
+            else
+                log "Building MAJIQ database..."
+                majiq build "${GTF_FILE}" \
+                    -c "${majiq_config}" \
+                    -j ${THREADS} \
+                    -o "${MAJIQ_DIR}/build" \
+                    2>&1 | tee "${LOGS_DIR}/majiq_build.log"
+            fi
             
             # Run deltapsi analysis
-            log "Running MAJIQ deltapsi..."
-            majiq deltapsi \
-                -grp1 "${MAJIQ_DIR}/build/"*"${CONDITION1}"*.majiq \
-                -grp2 "${MAJIQ_DIR}/build/"*"${CONDITION2}"*.majiq \
-                -j ${THREADS} \
-                -o "${MAJIQ_DIR}/deltapsi" \
-                -n "${CONDITION1}" "${CONDITION2}" \
-                2>&1 | tee "${LOGS_DIR}/majiq_deltapsi.log"
+            if [[ -d "${MAJIQ_DIR}/deltapsi" ]] && [[ -n "$(ls -A ${MAJIQ_DIR}/deltapsi/*.voila 2>/dev/null)" ]]; then
+                log "MAJIQ deltapsi results already exist, skipping..."
+            else
+                log "Running MAJIQ deltapsi..."
+                majiq deltapsi \
+                    -grp1 "${MAJIQ_DIR}/build/"*"${CONDITION1}"*.majiq \
+                    -grp2 "${MAJIQ_DIR}/build/"*"${CONDITION2}"*.majiq \
+                    -j ${THREADS} \
+                    -o "${MAJIQ_DIR}/deltapsi" \
+                    -n "${CONDITION1}" "${CONDITION2}" \
+                    2>&1 | tee "${LOGS_DIR}/majiq_deltapsi.log"
+            fi
             
             # Generate VOILA output
-            log "Running VOILA..."
-            voila tsv \
-                "${MAJIQ_DIR}/build/splicegraph.sql" \
-                "${MAJIQ_DIR}/deltapsi/"*.deltapsi.voila \
-                -f "${MAJIQ_DIR}/voila_results.tsv" \
-                2>&1 | tee "${LOGS_DIR}/voila.log"
+            if [[ -f "${MAJIQ_DIR}/voila_results.tsv" ]]; then
+                log "VOILA results already exist, skipping..."
+            else
+                log "Running VOILA..."
+                voila tsv \
+                    "${MAJIQ_DIR}/build/splicegraph.sql" \
+                    "${MAJIQ_DIR}/deltapsi/"*.deltapsi.voila \
+                    -f "${MAJIQ_DIR}/voila_results.tsv" \
+                    2>&1 | tee "${LOGS_DIR}/voila.log"
+            fi
             
             log "MAJIQ output files:"
             ls -la "${MAJIQ_DIR}"/*.tsv "${MAJIQ_DIR}"/*.voila 2>/dev/null || true
@@ -846,82 +880,86 @@ fi
 log_step "Preparing test data for sashimiplots"
 
 TEST_DATA_DIR="${OUTPUT_DIR}/sashimiplots_testdata"
-mkdir -p "${TEST_DATA_DIR}"
 
-# Copy BAM files
-log "Copying BAM files..."
-for sample in "${!SAMPLES[@]}"; do
-    cp "${ALIGNED_DIR}/${sample}.sorted.bam" "${TEST_DATA_DIR}/"
-    cp "${ALIGNED_DIR}/${sample}.sorted.bam.bai" "${TEST_DATA_DIR}/"
-done
+if [[ -f "${TEST_DATA_DIR}/sample_info.tsv" ]] && [[ -f "${TEST_DATA_DIR}/example_all_tools.R" ]]; then
+    log "Test data already prepared, skipping..."
+else
+    mkdir -p "${TEST_DATA_DIR}"
 
-# Create tool result directories
-mkdir -p "${TEST_DATA_DIR}/rmats"
-mkdir -p "${TEST_DATA_DIR}/suppa2"
-mkdir -p "${TEST_DATA_DIR}/leafcutter"
-mkdir -p "${TEST_DATA_DIR}/dexseq"
-mkdir -p "${TEST_DATA_DIR}/junctionseq"
-mkdir -p "${TEST_DATA_DIR}/majiq"
-mkdir -p "${TEST_DATA_DIR}/miso"
+    # Copy BAM files
+    log "Copying BAM files..."
+    for sample in "${!SAMPLES[@]}"; do
+        cp "${ALIGNED_DIR}/${sample}.sorted.bam" "${TEST_DATA_DIR}/"
+        cp "${ALIGNED_DIR}/${sample}.sorted.bam.bai" "${TEST_DATA_DIR}/"
+    done
 
-# Copy results from each tool
-if [[ -d "${RMATS_DIR}" ]]; then
-    log "Copying rMATS results..."
-    cp "${RMATS_DIR}"/*.MATS.JCEC.txt "${TEST_DATA_DIR}/rmats/" 2>/dev/null || true
-    cp "${RMATS_DIR}"/*.MATS.JC.txt "${TEST_DATA_DIR}/rmats/" 2>/dev/null || true
-fi
+    # Create tool result directories
+    mkdir -p "${TEST_DATA_DIR}/rmats"
+    mkdir -p "${TEST_DATA_DIR}/suppa2"
+    mkdir -p "${TEST_DATA_DIR}/leafcutter"
+    mkdir -p "${TEST_DATA_DIR}/dexseq"
+    mkdir -p "${TEST_DATA_DIR}/junctionseq"
+    mkdir -p "${TEST_DATA_DIR}/majiq"
+    mkdir -p "${TEST_DATA_DIR}/miso"
 
-if [[ -d "${SUPPA2_DIR}" ]]; then
-    log "Copying SUPPA2 results..."
-    cp "${SUPPA2_DIR}"/*.psi "${TEST_DATA_DIR}/suppa2/" 2>/dev/null || true
-    cp "${SUPPA2_DIR}"/*.dpsi "${TEST_DATA_DIR}/suppa2/" 2>/dev/null || true
-    cp "${SUPPA2_DIR}"/*.ioe "${TEST_DATA_DIR}/suppa2/" 2>/dev/null || true
-fi
+    # Copy results from each tool
+    if [[ -d "${RMATS_DIR}" ]]; then
+        log "Copying rMATS results..."
+        cp "${RMATS_DIR}"/*.MATS.JCEC.txt "${TEST_DATA_DIR}/rmats/" 2>/dev/null || true
+        cp "${RMATS_DIR}"/*.MATS.JC.txt "${TEST_DATA_DIR}/rmats/" 2>/dev/null || true
+    fi
 
-if [[ -d "${LEAFCUTTER_DIR}" ]]; then
-    log "Copying Leafcutter results..."
-    cp "${LEAFCUTTER_DIR}"/*cluster* "${TEST_DATA_DIR}/leafcutter/" 2>/dev/null || true
-    cp "${LEAFCUTTER_DIR}"/*effect_sizes* "${TEST_DATA_DIR}/leafcutter/" 2>/dev/null || true
-fi
+    if [[ -d "${SUPPA2_DIR}" ]]; then
+        log "Copying SUPPA2 results..."
+        cp "${SUPPA2_DIR}"/*.psi "${TEST_DATA_DIR}/suppa2/" 2>/dev/null || true
+        cp "${SUPPA2_DIR}"/*.dpsi "${TEST_DATA_DIR}/suppa2/" 2>/dev/null || true
+        cp "${SUPPA2_DIR}"/*.ioe "${TEST_DATA_DIR}/suppa2/" 2>/dev/null || true
+    fi
 
-if [[ -d "${DEXSEQ_DIR}" ]]; then
-    log "Copying DEXSeq results..."
-    cp "${DEXSEQ_DIR}"/*.csv "${TEST_DATA_DIR}/dexseq/" 2>/dev/null || true
-fi
+    if [[ -d "${LEAFCUTTER_DIR}" ]]; then
+        log "Copying Leafcutter results..."
+        cp "${LEAFCUTTER_DIR}"/*cluster* "${TEST_DATA_DIR}/leafcutter/" 2>/dev/null || true
+        cp "${LEAFCUTTER_DIR}"/*effect_sizes* "${TEST_DATA_DIR}/leafcutter/" 2>/dev/null || true
+    fi
 
-if [[ -d "${JUNCTIONSEQ_DIR}" ]]; then
-    log "Copying JunctionSeq results..."
-    cp "${JUNCTIONSEQ_DIR}"/*.txt "${TEST_DATA_DIR}/junctionseq/" 2>/dev/null || true
-fi
+    if [[ -d "${DEXSEQ_DIR}" ]]; then
+        log "Copying DEXSeq results..."
+        cp "${DEXSEQ_DIR}"/*.csv "${TEST_DATA_DIR}/dexseq/" 2>/dev/null || true
+    fi
 
-if [[ -d "${MAJIQ_DIR}" ]]; then
-    log "Copying MAJIQ results..."
-    cp "${MAJIQ_DIR}"/*.tsv "${TEST_DATA_DIR}/majiq/" 2>/dev/null || true
-    cp "${MAJIQ_DIR}/deltapsi/"*.voila "${TEST_DATA_DIR}/majiq/" 2>/dev/null || true
-fi
+    if [[ -d "${JUNCTIONSEQ_DIR}" ]]; then
+        log "Copying JunctionSeq results..."
+        cp "${JUNCTIONSEQ_DIR}"/*.txt "${TEST_DATA_DIR}/junctionseq/" 2>/dev/null || true
+    fi
 
-if [[ -d "${MISO_DIR}/comparisons" ]]; then
-    log "Copying MISO results..."
-    cp "${MISO_DIR}/comparisons/"*.miso_bf "${TEST_DATA_DIR}/miso/" 2>/dev/null || true
-fi
+    if [[ -d "${MAJIQ_DIR}" ]]; then
+        log "Copying MAJIQ results..."
+        cp "${MAJIQ_DIR}"/*.tsv "${TEST_DATA_DIR}/majiq/" 2>/dev/null || true
+        cp "${MAJIQ_DIR}/deltapsi/"*.voila "${TEST_DATA_DIR}/majiq/" 2>/dev/null || true
+    fi
 
-# Copy GTF
-if [[ -f "${GTF_FILE}" ]]; then
-    log "Copying annotation file..."
-    cp "${GTF_FILE}" "${TEST_DATA_DIR}/"
-fi
+    if [[ -d "${MISO_DIR}/comparisons" ]]; then
+        log "Copying MISO results..."
+        cp "${MISO_DIR}/comparisons/"*.miso_bf "${TEST_DATA_DIR}/miso/" 2>/dev/null || true
+    fi
 
-# Create sample metadata
-log "Creating sample metadata..."
-cat > "${TEST_DATA_DIR}/sample_info.tsv" << EOF
+    # Copy GTF
+    if [[ -f "${GTF_FILE}" ]]; then
+        log "Copying annotation file..."
+        cp "${GTF_FILE}" "${TEST_DATA_DIR}/"
+    fi
+
+    # Create sample metadata
+    log "Creating sample metadata..."
+    cat > "${TEST_DATA_DIR}/sample_info.tsv" << EOF
 sample_id	condition	bam_file
 EOF
-for sample in "${!SAMPLES[@]}"; do
-    echo -e "${sample}\t${SAMPLES[$sample]}\t${sample}.sorted.bam" >> "${TEST_DATA_DIR}/sample_info.tsv"
-done
+    for sample in "${!SAMPLES[@]}"; do
+        echo -e "${sample}\t${SAMPLES[$sample]}\t${sample}.sorted.bam" >> "${TEST_DATA_DIR}/sample_info.tsv"
+    done
 
-# Create example R script
-cat > "${TEST_DATA_DIR}/example_all_tools.R" << 'EOF'
+    # Create example R script
+    cat > "${TEST_DATA_DIR}/example_all_tools.R" << 'EOF'
 # Example script for using sashimiplots with all supported tools
 library(sashimiplots)
 
@@ -1019,6 +1057,7 @@ EOF
 
 log "Test data prepared at: ${TEST_DATA_DIR}"
 ls -la "${TEST_DATA_DIR}"
+fi
 
 # ============================================
 # Summary
