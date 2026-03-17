@@ -250,11 +250,11 @@ ENV PATH="/tools/salmon-latest_linux_x86_64/bin:${PATH}"
 # Install FeatureCounts (for read counting)
 # ============================================
 WORKDIR /tools
-RUN wget https://github.com/ShiLab-Bioinformatics/subread/releases/download/2.0.6/subread-2.0.6-Linux-x86_64.tar.gz && \
-    tar -zxvf subread-2.0.6-Linux-x86_64.tar.gz && \
-    rm subread-2.0.6-Linux-x86_64.tar.gz
+RUN wget https://github.com/ShiLab-Bioinformatics/subread/releases/download/2.0.2/subread-2.0.2-Linux-x86_64.tar.gz && \
+    tar -zxvf subread-2.0.2-Linux-x86_64.tar.gz && \
+    rm subread-2.0.2-Linux-x86_64.tar.gz
 
-ENV PATH="/tools/subread-2.0.6-Linux-x86_64/bin:${PATH}"
+ENV PATH="/tools/subread-2.0.2-Linux-x86_64/bin:${PATH}"
 
 
 
