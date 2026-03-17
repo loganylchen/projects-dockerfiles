@@ -245,6 +245,19 @@ RUN wget https://github.com/COMBINE-lab/salmon/releases/download/v1.10.0/salmon-
     rm salmon-1.10.0_linux_x86_64.tar.gz
 ENV PATH="/tools/salmon-latest_linux_x86_64/bin:${PATH}"
 
+
+# ============================================
+# Install FeatureCounts (for read counting)
+# ============================================
+WORKDIR /tools
+RUN wget https://github.com/ShiLab-Bioinformatics/subread/releases/download/2.0.6/subread-2.0.6-Linux-x86_64.tar.gz && \
+    tar -zxvf subread-2.0.6-Linux-x86_64.tar.gz && \
+    rm subread-2.0.6-Linux-x86_64.tar.gz
+
+ENV PATH="/tools/subread-2.0.6-Linux-x86_64/bin:${PATH}"
+
+
+
 # ============================================
 # Create helper scripts directory
 # ============================================
